@@ -16,17 +16,22 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.test.util.ReflectionTestUtils;
 
 public class StateServiceTest {
 
 	@Mock
 	private CustomStateRepository stateRepository;
 	private StateService service;
+	@Mock
+	private NotificationHandler notificationHandler;
 
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		service = new StateService(stateRepository);
+		service = new StateService(stateRepository, notificationHandler);
+		ReflectionTestUtils.setField(service, "uploadFailedState", "UPLOAD_FAILED");
+		ReflectionTestUtils.setField(service, "uploadSucceededState", "UPLOAD_SUCCEEDED");
 	}
 
 	@After
@@ -37,14 +42,18 @@ public class StateServiceTest {
 	@Test
 	public void testSetState() {
 		State state = mock(State.class);
+		when(state.getPackageId()).thenReturn("packageId");
+		when(state.getState()).thenReturn("state");
+		when(state.getCodicil()).thenReturn("codicil");
 		State returnState = mock(State.class);
 		when(returnState.getId()).thenReturn("id");
 		when(stateRepository.save(state)).thenReturn(returnState);
 
-		String stateId = service.setState(state);
+		String stateId = service.setState(state, "origin");
 
 		assertEquals("id", stateId);
 		verify(stateRepository).save(state);
+		verify(notificationHandler).sendNotification("packageId", "state", "origin", "codicil");
 	}
 
 	@Test
@@ -91,5 +100,41 @@ public class StateServiceTest {
 
 		assertEquals(1, allCurrentStates.size());
 		assertEquals(true, allCurrentStates.contains(state1));
+	}
+
+	@Test
+	public void testFailablePackagesAfterStateChangeDate() throws Exception {
+		Date changedAfterDate = new Date(new Date().getTime() - 1000L);
+		State state1 = mock(State.class);
+		State state2 = mock(State.class);
+		List<State> states = Arrays.asList(state1, state2);
+		when(stateRepository.findFailablePackagesAfterStateChangeDate(changedAfterDate)).thenReturn(states);
+		assertEquals(states, service.findFailablePackagesAfterStateChangeDate(changedAfterDate));
+	}
+
+	@Test
+	public void testIsPackageSucceededTrue() throws Exception {
+		State state1 = new State();
+		when(stateRepository.findPackageByIdAndByState("1234", "UPLOAD_SUCCEEDED")).thenReturn(state1);
+		assertEquals(true, service.isPackageSucceeded("1234"));
+	}
+
+	@Test
+	public void testIsPackageSucceededFalse() throws Exception {
+		when(stateRepository.findPackageByIdAndByState("1234", "UPLOAD_SUCCEEDED")).thenReturn(null);
+		assertEquals(false, service.isPackageSucceeded("1234"));
+	}
+
+	@Test
+	public void testIsPackageFailedTrue() throws Exception {
+		State state1 = new State();
+		when(stateRepository.findPackageByIdAndByState("1234", "UPLOAD_FAILED")).thenReturn(state1);
+		assertEquals(true, service.isPackageFailed("1234"));
+	}
+
+	@Test
+	public void testIsPackageFailedFalse() throws Exception {
+		when(stateRepository.findPackageByIdAndByState("1234", "UPLOAD_FAILED")).thenReturn(null);
+		assertEquals(false, service.isPackageFailed("1234"));
 	}
 }

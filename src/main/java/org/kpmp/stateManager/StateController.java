@@ -1,6 +1,5 @@
 package org.kpmp.stateManager;
 
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -11,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,16 +25,21 @@ public class StateController {
 	private StateService stateService;
 	private static final Log log = LogFactory.getLog(StateController.class);
 
+	@Value("${package.state.longpoll.timeout}")
+	Long longPollTimeoutMillis;
+
 	@Autowired
 	public StateController(StateService stateService) {
 		this.stateService = stateService;
 	}
 
-	@RequestMapping(value = "/v1/state", method = RequestMethod.POST)
-	public @ResponseBody String setState(@RequestBody State state, HttpServletRequest request) {
+	@RequestMapping(value = "/v1/state/host/{host}", method = RequestMethod.POST)
+	public @ResponseBody String setState(@RequestBody State state, @PathVariable("host") String origin,
+			HttpServletRequest request) {
+		String largeFilesChecked = null == state.getLargeUploadChecked() ? "null" : state.getLargeUploadChecked();
 		log.info("URI: " + request.getRequestURI() + " | PKGID: " + state.getPackageId() + " | MSG: Saving new state: "
-				+ state.getState());
-		return stateService.setState(state);
+				+ state.getState() + " | largeFilesChecked: " + largeFilesChecked);
+		return stateService.setState(state, origin);
 	}
 
 	@RequestMapping(value = "/v1/state/{packageId}", method = RequestMethod.GET)
@@ -50,16 +55,15 @@ public class StateController {
 	}
 
 	@RequestMapping(value = "/v1/state/events/{afterTime}", method = RequestMethod.GET)
-	public @ResponseBody DeferredResult<List<State>> getStateEvents(@PathVariable("afterTime") String afterTime, HttpServletRequest request) {
-        Date stateChangeDate = new Date(new Long(afterTime));
+	public @ResponseBody DeferredResult<List<State>> getStateEvents(@PathVariable("afterTime") String afterTime,
+			HttpServletRequest request) {
+		Date stateChangeDate = new Date(new Long(afterTime));
 
 		log.info("URI: " + request.getRequestURI() + " | MSG: Long poll for events after " + stateChangeDate);
 
-		// Timeout after 1 minute
-		Long timeOutInMilliSec = 60000L;
 		String timeOutResp = "{\"timeout\": true}";
-		DeferredResult<List<State>> deferredResult = new DeferredResult<>(timeOutInMilliSec,timeOutResp);
-		CompletableFuture.runAsync(()->{
+		DeferredResult<List<State>> deferredResult = new DeferredResult<>(longPollTimeoutMillis, timeOutResp);
+		CompletableFuture.runAsync(() -> {
 			try {
 				List<State> result = stateService.findPackagesChangedAfterStateChangeDate(stateChangeDate);
 
@@ -68,14 +72,13 @@ public class StateController {
 					result = stateService.findPackagesChangedAfterStateChangeDate(stateChangeDate);
 				}
 
-				log.info("URI: " + request.getRequestURI() + " | MSG: Long poll returning " + result.size() + " records");
+				log.info("URI: " + request.getRequestURI() + " | MSG: Long poll returning " + result.size()
+						+ " records");
 
-				//Useful for debugging; remove when we're done with spike / KPMP-1255
-                log.info("first record's stateChange Date asa UTC ms: " + result.get(0).getStateChangeDate().getTime());
-
-				//set result after completing task to return response to client
 				deferredResult.setResult(result);
-			}catch (Exception ex){
+			} catch (Exception ex) {
+				log.error("URI: " + request.getRequestURI() + "| MSG: Long polling encountered error: "
+						+ ex.getMessage());
 			}
 		});
 

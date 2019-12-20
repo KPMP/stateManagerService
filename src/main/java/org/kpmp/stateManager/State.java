@@ -12,6 +12,7 @@ public class State {
 	private String id;
 	private String packageId;
 	private String state;
+	private String largeUploadChecked;
 	private String codicil;
 	private Date stateChangeDate;
 
@@ -38,6 +39,10 @@ public class State {
 	public void setState(String state) {
 		this.state = state;
 	}
+
+	public String getLargeUploadChecked() { return largeUploadChecked; }
+
+	public void setLargeUploadChecked(String largeUploadChecked) { this.largeUploadChecked = largeUploadChecked; }
 
 	public String getPackageId() {
 		return packageId;
