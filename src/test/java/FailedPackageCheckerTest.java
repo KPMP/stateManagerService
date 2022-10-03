@@ -2,6 +2,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.kpmp.FailedPackageChecker;
+import org.kpmp.dataManager.DataManagerRepository;
+import org.kpmp.dataManager.DluPackageInventory;
 import org.kpmp.stateManager.State;
 import org.kpmp.stateManager.StateService;
 import org.mockito.Mock;
@@ -12,6 +14,7 @@ import org.springframework.web.client.RestTemplate;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 
 public class FailedPackageCheckerTest {
 
@@ -20,6 +23,10 @@ public class FailedPackageCheckerTest {
     private StateService service;
     @Mock
     RestTemplate restTemplate;
+
+    @Mock
+    DataManagerRepository dataManagerRepository;
+
     private FailedPackageChecker packageChecker;
     @Value("${package.state.checker.timeout}")
     private long timeout;
@@ -27,7 +34,7 @@ public class FailedPackageCheckerTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        packageChecker = new FailedPackageChecker(service, restTemplate);
+        packageChecker = new FailedPackageChecker(service, restTemplate, dataManagerRepository);
     }
 
     @After
@@ -43,6 +50,14 @@ public class FailedPackageCheckerTest {
     @Test
     public void testPackageDidFail() throws Exception {
         State state = new State();
+
+        // To Do: Mock enough of this out so we can test the "run" method
+//        state.setPackageId("package_id");
+//        DluPackageInventory packageInventory = new DluPackageInventory();
+//        packageInventory.setDluError(false);
+//        packageInventory.setDluPackageId("package_id");
+//        when(dataManagerRepository.findByDluPackageId("package_id")).thenReturn(packageInventory);
+
         long timeSinceLastModified = System.currentTimeMillis() - timeout + 1;
         assertFalse(packageChecker.packageDidFail(state, timeSinceLastModified));
 

@@ -7,6 +7,8 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.kpmp.dataManager.DataManagerRepository;
+import org.kpmp.dataManager.DluPackageInventory;
 import org.kpmp.stateManager.State;
 import org.kpmp.stateManager.StateService;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,9 +42,12 @@ public class FailedPackageChecker implements CommandLineRunner {
 
 	private RestTemplate restTemplate;
 
-	public FailedPackageChecker(StateService stateService, RestTemplate restTemplate) {
+	private DataManagerRepository dataManagerRepository;
+
+	public FailedPackageChecker(StateService stateService, RestTemplate restTemplate, DataManagerRepository dataManagerRepository) {
 		this.stateService = stateService;
 		this.restTemplate = restTemplate;
+		this.dataManagerRepository = dataManagerRepository;
 	}
 
 	public static void main(String[] args) {
@@ -103,6 +108,9 @@ public class FailedPackageChecker implements CommandLineRunner {
 				failedState.setStateChangeDate(new Date());
 				failedState.setCodicil("Failed stale package check");
 				sendStateChange(failedState);
+				DluPackageInventory failedDmdPackage = dataManagerRepository.findByDluPackageId(state.getPackageId());
+				failedDmdPackage.setDluError(true);
+				dataManagerRepository.save(failedDmdPackage);
 			}
 		}
 
