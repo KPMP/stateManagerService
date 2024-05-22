@@ -8,6 +8,7 @@ buildscript {
 }
 
 plugins {
+    id 'java'
     id 'com.palantir.docker' version '0.35.0'
     id 'org.springframework.boot' version '3.2.2'
 }
@@ -29,8 +30,8 @@ repositories {
     mavenCentral()
 }
 
-sourceCompatibility = JavaVersion.VERSION_21
-targetCompatibility = JavaVersion.VERSION_21
+sourceCompatibility = '21'
+targetCompatibility = '21'
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web' 
