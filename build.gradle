@@ -3,14 +3,14 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:3.2.2")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:3.2.5")
     }
 }
 
 plugins {
     id 'java'
     id 'com.palantir.docker' version '0.35.0'
-    id 'org.springframework.boot' version '3.2.2'
+    id 'org.springframework.boot' version '3.2.5'
 }
 	
 group='kingstonduo'
@@ -35,7 +35,7 @@ targetCompatibility = '21'
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web' 
-	implementation 'org.apache.commons:commons-compress:1.21'
+	implementation 'org.apache.commons:commons-compress:1.26.0'
 	implementation 'org.springframework.boot:spring-boot-starter-test'
 	implementation 'org.springframework.data:spring-data-mongodb'
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
