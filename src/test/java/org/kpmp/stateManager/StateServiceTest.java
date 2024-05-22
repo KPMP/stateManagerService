@@ -1,6 +1,6 @@
 package org.kpmp.stateManager;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -11,9 +11,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -28,16 +28,17 @@ public class StateServiceTest {
 	@Mock
 	private StateDisplayRepository stateDisplayRepo;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
-		MockitoAnnotations.initMocks(this);
+		MockitoAnnotations.openMocks(this);
 		service = new StateService(stateRepository, notificationHandler, stateDisplayRepo);
 		ReflectionTestUtils.setField(service, "uploadFailedState", "UPLOAD_FAILED");
 		ReflectionTestUtils.setField(service, "uploadSucceededState", "UPLOAD_SUCCEEDED");
 	}
 
-	@After
+	@AfterEach
 	public void tearDown() throws Exception {
+        MockitoAnnotations.openMocks(this).close();
 		service = null;
 	}
 
