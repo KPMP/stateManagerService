@@ -24,7 +24,7 @@ apply plugin: 'com.palantir.docker'
 
 jar {
     baseName='state-manager-service'
-    version= '2.2'
+    version= '2.1'
 }
 
 repositories {
