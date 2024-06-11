@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +17,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.async.DeferredResult;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 @Controller
 public class StateController {
 
-	private StateService stateService;
+	private final StateService stateService;
 	private static final Log log = LogFactory.getLog(StateController.class);
 
 	@Value("${package.state.longpoll.timeout}")
@@ -60,10 +60,11 @@ public class StateController {
 		return stateService.getAllStateDisplays();
 	}
 
+
 	@RequestMapping(value = "/v1/state/events/{afterTime}", method = RequestMethod.GET)
 	public @ResponseBody DeferredResult<List<State>> getStateEvents(@PathVariable("afterTime") String afterTime,
 			HttpServletRequest request) {
-		Date stateChangeDate = new Date(new Long(afterTime));
+		Date stateChangeDate = new Date(Long.parseLong(afterTime));
 
 		log.info("URI: " + request.getRequestURI() + " | MSG: Long poll for events after " + stateChangeDate);
 
@@ -73,7 +74,7 @@ public class StateController {
 			try {
 				List<State> result = stateService.findPackagesChangedAfterStateChangeDate(stateChangeDate);
 
-				while (result.size() == 0) {
+				while (result.isEmpty()) {
 					TimeUnit.SECONDS.sleep(2);
 					result = stateService.findPackagesChangedAfterStateChangeDate(stateChangeDate);
 				}

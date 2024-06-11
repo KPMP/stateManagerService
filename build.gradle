@@ -3,16 +3,18 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.6.4")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:3.2.5")
     }
-
 }
 
 plugins {
-    id 'com.palantir.docker' version '0.22.1'
+    id 'java'
+    id 'com.palantir.docker' version '0.35.0'
+    id 'org.springframework.boot' version '3.2.5'
 }
-
-group = 'kingstonduo'
+	
+group='kingstonduo'
+version='4.1'
 
 
 apply plugin: 'java'
@@ -22,27 +24,26 @@ apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'com.palantir.docker'
 
-jar {
-    baseName='state-manager-service'
-    version= '2.2'
-}
+
 
 repositories {
     mavenCentral()
 }
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = '21'
+targetCompatibility = '21'
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web' 
-	implementation 'org.apache.commons:commons-compress:1.21'
+	implementation 'org.apache.commons:commons-compress:1.26.0'
 	implementation 'org.springframework.boot:spring-boot-starter-test'
 	implementation 'org.springframework.data:spring-data-mongodb'
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.mockito:mockito-core'
-	testImplementation 'junit:junit:4.12'
+    testImplementation('org.mockito:mockito-junit-jupiter:3.12.4')
+    testImplementation 'org.springframework:spring-test:5.2.25.RELEASE'
 }
 
 springBoot {
@@ -71,7 +72,7 @@ def getCurrentGitBranch() {
       } catch (e) {
         }
         if (gitBranch == "develop" || gitBranch == "master"){
-          return jar.version
+          return project.version
         }else{
           return gitBranch
         }
@@ -79,7 +80,7 @@ def getCurrentGitBranch() {
 }
 
 docker {
-    name "kingstonduo/${jar.baseName}:" + getCurrentGitBranch()
+    name "kingstonduo/state-manager-service:" + getCurrentGitBranch()
     copySpec.from(tasks.unpack.outputs).into("dependency")
     buildArgs(['DEPENDENCY': "dependency"])
 }
