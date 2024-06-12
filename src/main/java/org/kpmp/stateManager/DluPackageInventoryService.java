@@ -16,7 +16,7 @@ public class DluPackageInventoryService {
     private String dataManagerHost;
     @Value("${data-manager.service.endpoint}")
     private String dataManagerEndpoint;
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
 
     private static final Log log = LogFactory.getLog(DluPackageInventoryService.class);
 
@@ -26,7 +26,7 @@ public class DluPackageInventoryService {
     }
 
     public String setPackageInError(String packageId) {
-        HashMap payload = new HashMap<>();
+        HashMap<String, Boolean> payload = new HashMap<>();
         payload.put("dlu_error", true);
         String retPackageId = null;
         String url = dataManagerHost + dataManagerEndpoint + "/package/" + packageId;

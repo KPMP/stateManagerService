@@ -11,7 +11,7 @@ class NotificationHandler {
 	private String notificationServiceHost;
 	@Value("${notification.endpoint}")
 	private String notificationEndpoint;
-	private RestTemplate restTemplate;
+	private final RestTemplate restTemplate;
 
 	public NotificationHandler(RestTemplate restTemplate) {
 		this.restTemplate = restTemplate;
