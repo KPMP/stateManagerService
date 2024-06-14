@@ -25,7 +25,7 @@ apply plugin: 'io.spring.dependency-management'
 apply plugin: 'com.palantir.docker'
 
 jar {
-    baseName='state-manager-service'
+    archivesBaseName='state-manager-service'
 }
 
 repositories {
