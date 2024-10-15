@@ -28,3 +28,4 @@ build/
 .idea
 *.iml
 bin/
+.vscode

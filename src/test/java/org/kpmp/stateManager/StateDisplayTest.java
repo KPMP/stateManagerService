@@ -1,26 +1,27 @@
 package org.kpmp.stateManager;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
 import org.bson.Document;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 
 public class StateDisplayTest {
 
 	private StateDisplay stateDisplay;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
-		MockitoAnnotations.initMocks(this);
+		MockitoAnnotations.openMocks(this);
 		stateDisplay = new StateDisplay();
 	}
 
-	@After
+	@AfterEach
 	public void tearDown() throws Exception {
+        MockitoAnnotations.openMocks(this).close();
 		stateDisplay = null;
 	}
 
