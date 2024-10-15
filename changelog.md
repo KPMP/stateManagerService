@@ -2,6 +2,7 @@
 
 ## Release 4.1 [unreleased]
 Brief summary of what's in this release:
+- Upgrade to Java 21
 
 
 ### Breaking changes
