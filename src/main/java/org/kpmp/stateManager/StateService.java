@@ -18,21 +18,17 @@ public class StateService {
 	private String uploadFailedState;
 	@Value("${package.state.upload.succeeded}")
 	private String uploadSucceededState;
-	private NotificationHandler notificationHandler;
 	private StateDisplayRepository stateDisplayRepo;
 
 	@Autowired
-	public StateService(CustomStateRepository stateRepository, NotificationHandler notificationHandler,
-			StateDisplayRepository stateDisplayRepo) {
+	public StateService(CustomStateRepository stateRepository, StateDisplayRepository stateDisplayRepo) {
 		this.stateRepository = stateRepository;
-		this.notificationHandler = notificationHandler;
 		this.stateDisplayRepo = stateDisplayRepo;
 	}
 
 	@CacheEvict(value = "states", allEntries = true)
 	public String setState(State state, String origin) {
 		State savedState = stateRepository.save(state);
-		notificationHandler.sendNotification(state.getPackageId(), state.getState(), origin, state.getCodicil());
 		return savedState.getId();
 	}
 
