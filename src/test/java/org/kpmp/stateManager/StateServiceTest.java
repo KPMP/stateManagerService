@@ -24,14 +24,12 @@ public class StateServiceTest {
 	private CustomStateRepository stateRepository;
 	private StateService service;
 	@Mock
-	private NotificationHandler notificationHandler;
-	@Mock
 	private StateDisplayRepository stateDisplayRepo;
 
 	@BeforeEach
 	public void setUp() throws Exception {
 		MockitoAnnotations.openMocks(this);
-		service = new StateService(stateRepository, notificationHandler, stateDisplayRepo);
+		service = new StateService(stateRepository, stateDisplayRepo);
 		ReflectionTestUtils.setField(service, "uploadFailedState", "UPLOAD_FAILED");
 		ReflectionTestUtils.setField(service, "uploadSucceededState", "UPLOAD_SUCCEEDED");
 	}
@@ -56,7 +54,6 @@ public class StateServiceTest {
 
 		assertEquals("id", stateId);
 		verify(stateRepository).save(state);
-		verify(notificationHandler).sendNotification("packageId", "state", "origin", "codicil");
 	}
 
 	@Test

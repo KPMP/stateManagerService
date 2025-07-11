@@ -1,6 +1,17 @@
 # Changelog
 
-## Release 4.1 [unreleased]
+## Release 4.2 [unreleased]
+Brief summary of what's in this release:
+Removed the calls to Notification Service and the configuration to talk to it since we are no longer sending success emails
+
+### Breaking changes
+
+Breaking changes include any database updates needed, if we need to edit any files on system (like .env or certs, etc). Things that are outside of the code itself that need changed for the system to work.
+
+
+---
+
+## Release 4.1 [Released 10/16/2024]
 Brief summary of what's in this release:
 - Upgrade to Java 21
 
