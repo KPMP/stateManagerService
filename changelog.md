@@ -1,6 +1,11 @@
 # Changelog
 
-## Release 4.2 [unreleased]
+## Release 4.3 
+Brief summary of what's in this release:
+- Bumped up version number
+
+
+## Release 4.2 [Released 9/2/2025]
 Brief summary of what's in this release:
 Removed the calls to Notification Service and the configuration to talk to it since we are no longer sending success emails
 
